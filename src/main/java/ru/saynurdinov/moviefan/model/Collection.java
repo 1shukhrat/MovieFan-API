@@ -26,7 +26,6 @@ public class Collection {
     private String name;
 
     @Column(name = "outline")
-    @NotBlank
     @Size(min = 5)
     private String outline;
 

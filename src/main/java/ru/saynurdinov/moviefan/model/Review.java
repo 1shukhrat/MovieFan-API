@@ -2,6 +2,7 @@ package ru.saynurdinov.moviefan.model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,6 +18,7 @@ public class Review {
     private long id;
 
     @Column(name = "review_text")
+    @NotBlank
     private String text;
 
     @ManyToOne

@@ -43,7 +43,7 @@ public class Movie {
     @ManyToMany(mappedBy = "movies")
     private List<Country> countries;
 
-    @ManyToMany(mappedBy = "genres")
+    @ManyToMany(mappedBy = "movies")
     private List<Genre> genres;
 
     @OneToMany(mappedBy = "movie")

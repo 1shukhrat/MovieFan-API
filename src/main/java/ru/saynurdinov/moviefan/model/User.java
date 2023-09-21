@@ -19,6 +19,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private long id;
 
     @Column(name = "login")
@@ -36,4 +37,9 @@ public class User {
 
     @OneToMany(mappedBy = "owner")
     private List<Review> reviews;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Rating> ratings;
+
+
 }
