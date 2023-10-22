@@ -31,4 +31,5 @@ public class MovieService {
     public List<Movie> getAll(int page) {
         return movieRepository.findAll(PageRequest.of(page, 20)).getContent();
     }
+
 }

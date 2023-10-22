@@ -6,13 +6,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.saynurdinov.moviefan.DTO.MovieDTO;
-import ru.saynurdinov.moviefan.DTO.MovieItemDTO;
+import ru.saynurdinov.moviefan.DTO.PreviewMovieDTO;
+import ru.saynurdinov.moviefan.DTO.StaffDTO;
+import ru.saynurdinov.moviefan.mapper.ActorListMapper;
+import ru.saynurdinov.moviefan.mapper.DirectorListMapper;
+import ru.saynurdinov.moviefan.mapper.MovieMapper;
+import ru.saynurdinov.moviefan.mapper.PreviewMovieListMapper;
 import ru.saynurdinov.moviefan.model.Movie;
 import ru.saynurdinov.moviefan.service.MovieService;
 import ru.saynurdinov.moviefan.util.MovieDoesntFoundException;
 import ru.saynurdinov.moviefan.util.MovieErrorResponse;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -20,45 +25,49 @@ import java.util.List;
 public class MovieController {
 
     private final MovieService movieService;
+    private final MovieMapper movieMapper;
+    private final PreviewMovieListMapper movieListMapper;
+
+    private final DirectorListMapper directorListMapper;
+
+    private final ActorListMapper actorListMapper;
+
 
     @Autowired
-    public MovieController(MovieService movieService) {
+    public MovieController(MovieService movieService, MovieMapper movieMapper, PreviewMovieListMapper movieListMapper, DirectorListMapper directorListMapper, ActorListMapper actorListMapper) {
         this.movieService = movieService;
+        this.movieMapper = movieMapper;
+        this.movieListMapper = movieListMapper;
+        this.directorListMapper = directorListMapper;
+        this.actorListMapper = actorListMapper;
     }
 
     @GetMapping("/movies")
-    public List<MovieItemDTO> getMovies(@RequestParam(name = "page") int page) {
+    public List<PreviewMovieDTO> getMovies(@RequestParam(name = "page") int page) {
         List<Movie> movies =  movieService.getAll(page);
-        return convertToDto(movies);
+        return movieListMapper.toDTO(movies);
     }
 
     @GetMapping("/movies/{id}")
     public MovieDTO getMovieById(@PathVariable("id") int id) {
-        return convertToDTO(movieService.get(id));
+        Movie movie = movieService.get(id);
+        return movieMapper.toDTO(movie);
+    }
+
+    @GetMapping("/movies/{id}/staff")
+    public StaffDTO getStaffByMovieId(@PathVariable("id") int id) {
+        StaffDTO staff = new StaffDTO();
+        Movie movie = movieService.get(id);
+        staff.setMovieTitle(movie.getTitle());
+        staff.setDirectors(directorListMapper.toDTO(movie.getDirectors()));
+        staff.setActors(actorListMapper.toDTO(movie.getActors()));
+        return staff;
     }
 
     @ExceptionHandler
     public ResponseEntity<MovieErrorResponse> handleException(MovieDoesntFoundException e) {
-        MovieErrorResponse response = new MovieErrorResponse("Movie with this id doesn't found", new Date());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
-
-    private List<MovieItemDTO> convertToDto(List<Movie> movies) {
-        return movies.stream().map(movie -> new MovieItemDTO(movie.getId(), movie.getTitle(),
-                movie.getPosterUrl(), movie.getUserRating())).toList();
-    }
-
-    private MovieDTO convertToDTO(Movie movie) {
-        MovieDTO movieDTO = new MovieDTO();
-        movieDTO.setId(movie.getId());
-        movieDTO.setTitle(movie.getTitle());
-        movieDTO.setYear(movie.getYear());
-        movieDTO.setOutline(movie.getOutline());
-        movieDTO.setPosterUrl(movie.getPosterUrl());
-        movieDTO.setDirectors(movie.getDirectors());
-        movieDTO.setCountries(movie.getCountries());
-        movieDTO.setGenres(movie.getGenres());
-        return movieDTO;
+        MovieErrorResponse movieErrorResponse = new MovieErrorResponse("Фильм не найден", LocalDateTime.now());
+        return new ResponseEntity<>(movieErrorResponse, HttpStatus.NOT_FOUND);
     }
 
 

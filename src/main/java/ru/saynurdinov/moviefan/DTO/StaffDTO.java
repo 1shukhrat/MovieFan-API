@@ -4,13 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MovieItemDTO {
-
-    private long id;
-    private String title;
-    private String poster;
-    private double userRating;
+public class StaffDTO {
+    private String movieTitle;
+    private List<DirectorDTO> directors;
+    private List<ActorDTO> actors;
 }
