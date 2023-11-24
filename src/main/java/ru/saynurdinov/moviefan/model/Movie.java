@@ -23,7 +23,7 @@ public class Movie {
     private String outline;
 
     @Column(name = "year")
-    private int year;
+    private int yearOfRelease;
 
     @Column(name = "poster")
     private String posterUrl;

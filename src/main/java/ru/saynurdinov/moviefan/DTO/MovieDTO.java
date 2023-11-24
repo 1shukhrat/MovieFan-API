@@ -18,6 +18,7 @@ public class MovieDTO {
     private String title;
     private String posterUrl;
     private String outline;
+    private int yearOfRelease;
     private double userRating;
     private List<CountryDTO> countries;
     private List<GenreDTO> genres;

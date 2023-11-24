@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/movies")
 public class MovieController {
 
     private final MovieService movieService;
@@ -42,19 +42,20 @@ public class MovieController {
         this.actorListMapper = actorListMapper;
     }
 
-    @GetMapping("/movies")
+    @GetMapping
     public List<PreviewMovieDTO> getMovies(@RequestParam(name = "page") int page) {
         List<Movie> movies =  movieService.getAll(page);
         return movieListMapper.toDTO(movies);
     }
 
-    @GetMapping("/movies/{id}")
+    @GetMapping("/{id}")
     public MovieDTO getMovieById(@PathVariable("id") int id) {
         Movie movie = movieService.get(id);
         return movieMapper.toDTO(movie);
     }
 
-    @GetMapping("/movies/{id}/staff")
+
+    @GetMapping("/{id}/staff")
     public StaffDTO getStaffByMovieId(@PathVariable("id") int id) {
         StaffDTO staff = new StaffDTO();
         Movie movie = movieService.get(id);
@@ -63,6 +64,7 @@ public class MovieController {
         staff.setActors(actorListMapper.toDTO(movie.getActors()));
         return staff;
     }
+
 
     @ExceptionHandler
     public ResponseEntity<MovieErrorResponse> handleException(MovieDoesntFoundException e) {

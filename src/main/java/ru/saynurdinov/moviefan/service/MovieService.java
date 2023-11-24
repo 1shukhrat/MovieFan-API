@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.saynurdinov.moviefan.model.Genre;
 import ru.saynurdinov.moviefan.model.Movie;
 import ru.saynurdinov.moviefan.repository.MovieRepository;
 import ru.saynurdinov.moviefan.util.MovieDoesntFoundException;
@@ -30,6 +31,11 @@ public class MovieService {
     @Transactional(readOnly = true)
     public List<Movie> getAll(int page) {
         return movieRepository.findAll(PageRequest.of(page, 20)).getContent();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Movie> getAllByGenre(Genre genre, int page) {
+        return movieRepository.findAllByGenres(genre, PageRequest.of(page, 20)).getContent();
     }
 
 }
