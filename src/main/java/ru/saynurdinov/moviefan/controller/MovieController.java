@@ -13,12 +13,15 @@ import ru.saynurdinov.moviefan.mapper.DirectorListMapper;
 import ru.saynurdinov.moviefan.mapper.MovieMapper;
 import ru.saynurdinov.moviefan.mapper.PreviewMovieListMapper;
 import ru.saynurdinov.moviefan.model.Movie;
+import ru.saynurdinov.moviefan.service.CountryService;
+import ru.saynurdinov.moviefan.service.GenreService;
 import ru.saynurdinov.moviefan.service.MovieService;
 import ru.saynurdinov.moviefan.util.MovieDoesntFoundException;
 import ru.saynurdinov.moviefan.util.MovieErrorResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/movies")
@@ -27,24 +30,27 @@ public class MovieController {
     private final MovieService movieService;
     private final MovieMapper movieMapper;
     private final PreviewMovieListMapper movieListMapper;
-
     private final DirectorListMapper directorListMapper;
-
     private final ActorListMapper actorListMapper;
+    private final GenreService genreService;
+    private final CountryService countryService;
 
 
     @Autowired
-    public MovieController(MovieService movieService, MovieMapper movieMapper, PreviewMovieListMapper movieListMapper, DirectorListMapper directorListMapper, ActorListMapper actorListMapper) {
+    public MovieController(MovieService movieService, MovieMapper movieMapper, PreviewMovieListMapper movieListMapper, DirectorListMapper directorListMapper, ActorListMapper actorListMapper, GenreService genreService, CountryService countryService) {
         this.movieService = movieService;
         this.movieMapper = movieMapper;
         this.movieListMapper = movieListMapper;
         this.directorListMapper = directorListMapper;
         this.actorListMapper = actorListMapper;
+        this.genreService = genreService;
+        this.countryService = countryService;
     }
 
     @GetMapping
-    public List<PreviewMovieDTO> getMovies(@RequestParam(name = "page") int page) {
-        List<Movie> movies =  movieService.getAll(page);
+    public List<PreviewMovieDTO> getMovies(@RequestParam(name = "page") int page, @RequestParam(required = false, name = "genre") String genreName,
+     @RequestParam(required = false, name = "country") String countryName) {
+        List<Movie> movies = movieService.getAll(page, genreService.getByName(genreName), countryService.getByName(countryName));
         return movieListMapper.toDTO(movies);
     }
 

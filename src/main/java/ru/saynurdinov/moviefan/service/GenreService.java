@@ -8,6 +8,7 @@ import ru.saynurdinov.moviefan.model.Genre;
 import ru.saynurdinov.moviefan.repository.GenreRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GenreService {
@@ -22,5 +23,17 @@ public class GenreService {
     @Transactional(readOnly = true)
     public List<Genre> getAll() {
         return genreRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Genre getByName(String name) {
+        if (name == null) {
+            return null;
+        }
+        else {
+            Optional<Genre> genre = genreRepository.findById(name);
+            return genre.orElse(null);
+        }
+
     }
 }
