@@ -49,8 +49,9 @@ public class MovieController {
 
     @GetMapping
     public List<PreviewMovieDTO> getMovies(@RequestParam(name = "page") int page, @RequestParam(required = false, name = "genre") String genreName,
-     @RequestParam(required = false, name = "country") String countryName) {
-        List<Movie> movies = movieService.getAll(page, genreService.getByName(genreName), countryService.getByName(countryName));
+     @RequestParam(required = false, name = "country") String countryName,
+                                           @RequestParam(required = false, name = "year", defaultValue = "0") List<Integer> year) {
+        List<Movie> movies = movieService.getAll(page, genreService.getByName(genreName), countryService.getByName(countryName), year);
         return movieListMapper.toDTO(movies);
     }
 
