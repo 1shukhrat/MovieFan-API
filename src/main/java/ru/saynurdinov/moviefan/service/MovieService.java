@@ -2,11 +2,10 @@ package ru.saynurdinov.moviefan.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.saynurdinov.moviefan.model.Country;
-import ru.saynurdinov.moviefan.model.Genre;
-import ru.saynurdinov.moviefan.model.Movie;
+import ru.saynurdinov.moviefan.model.*;
 import ru.saynurdinov.moviefan.repository.MovieRepository;
 import ru.saynurdinov.moviefan.util.MovieDoesntFoundException;
 
@@ -31,24 +30,16 @@ public class MovieService {
     }
 
     @Transactional(readOnly = true)
-    public List<Movie> getAll(int page, Genre genre, Country country, List<Integer> year) {
-        if (genre != null && country!= null) {
-            return movieRepository.findAllByGenreAndCountry(country, genre, PageRequest.of(page, 20)).getContent();
-        }
-        else if (genre != null) {
-            return movieRepository.findAllByGenre(genre, PageRequest.of(page, 20)).getContent();
-        }
-        else if (country != null) {
-            return movieRepository.findAllByCountry(country, PageRequest.of(page, 20)).getContent();
-        }
-        else if (!year.contains(0)) {
-            if (year.contains(1984)) {
-                return movieRepository.findAllByYearOfReleaseLessThan(1985, PageRequest.of(page, 20)).getContent();
-            }
-            return movieRepository.findAllByYearOfReleases(year, PageRequest.of(page, 20)).getContent();
-        }
-        else {
-            return movieRepository.findAll(PageRequest.of(page, 20)).getContent();
+    public List<Movie> getAll(int page, Genre genre, Country country, int yearStart, int yearEnd) {
+        Pageable p = PageRequest.of(page, 20);
+        if (genre != null && country != null) {
+            return movieRepository.findAllByCountriesAndGenresAndYearOfReleaseBetween(country, genre, yearStart, yearEnd, p).getContent();
+        } else if (genre != null) {
+            return movieRepository.findAllByGenresAndYearOfReleaseBetween(genre, yearStart, yearEnd, p).getContent();
+        } else if (country != null) {
+            return movieRepository.findAllByCountriesAndYearOfReleaseBetween(country, yearStart, yearEnd, p).getContent();
+        } else {
+            return movieRepository.findAllByYearOfReleaseBetween(yearStart, yearEnd, p).getContent();
         }
     }
 }

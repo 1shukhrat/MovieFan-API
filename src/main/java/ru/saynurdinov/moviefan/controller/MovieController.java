@@ -13,20 +13,20 @@ import ru.saynurdinov.moviefan.mapper.DirectorListMapper;
 import ru.saynurdinov.moviefan.mapper.MovieMapper;
 import ru.saynurdinov.moviefan.mapper.PreviewMovieListMapper;
 import ru.saynurdinov.moviefan.model.Movie;
-import ru.saynurdinov.moviefan.service.CountryService;
-import ru.saynurdinov.moviefan.service.GenreService;
-import ru.saynurdinov.moviefan.service.MovieService;
+import ru.saynurdinov.moviefan.service.*;
 import ru.saynurdinov.moviefan.util.MovieDoesntFoundException;
 import ru.saynurdinov.moviefan.util.MovieErrorResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/movies")
 public class MovieController {
 
+    private final DirectorService directorService;
+
+    private final ActorService actorService;
     private final MovieService movieService;
     private final MovieMapper movieMapper;
     private final PreviewMovieListMapper movieListMapper;
@@ -37,7 +37,9 @@ public class MovieController {
 
 
     @Autowired
-    public MovieController(MovieService movieService, MovieMapper movieMapper, PreviewMovieListMapper movieListMapper, DirectorListMapper directorListMapper, ActorListMapper actorListMapper, GenreService genreService, CountryService countryService) {
+    public MovieController(DirectorService directorService, ActorService actorService, MovieService movieService, MovieMapper movieMapper, PreviewMovieListMapper movieListMapper, DirectorListMapper directorListMapper, ActorListMapper actorListMapper, GenreService genreService, CountryService countryService) {
+        this.directorService = directorService;
+        this.actorService = actorService;
         this.movieService = movieService;
         this.movieMapper = movieMapper;
         this.movieListMapper = movieListMapper;
@@ -48,15 +50,17 @@ public class MovieController {
     }
 
     @GetMapping
-    public List<PreviewMovieDTO> getMovies(@RequestParam(name = "page") int page, @RequestParam(required = false, name = "genre") String genreName,
-     @RequestParam(required = false, name = "country") String countryName,
-                                           @RequestParam(required = false, name = "year", defaultValue = "0") List<Integer> year) {
-        List<Movie> movies = movieService.getAll(page, genreService.getByName(genreName), countryService.getByName(countryName), year);
+    public List<PreviewMovieDTO> getAll(@RequestParam(name = "page", defaultValue = "0") int page,
+                                        @RequestParam(required = false, name = "genre") String genreName,
+                                        @RequestParam(required = false, name = "country") String countryName,
+                                        @RequestParam(name = "startYear", defaultValue = "1939") int yearStart,
+                                        @RequestParam(name = "endYear", defaultValue = "2023") int yearEnd) {
+        List<Movie> movies = movieService.getAll(page, genreService.getByName(genreName), countryService.getByName(countryName), yearStart, yearEnd);
         return movieListMapper.toDTO(movies);
     }
 
     @GetMapping("/{id}")
-    public MovieDTO getMovieById(@PathVariable("id") int id) {
+    public MovieDTO getById(@PathVariable("id") int id) {
         Movie movie = movieService.get(id);
         return movieMapper.toDTO(movie);
     }
