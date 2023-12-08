@@ -23,14 +23,10 @@ public class User {
     private long id;
 
     @Column(name = "login")
-    @NotBlank
-    @Size(min = 4, max = 20)
     private String login;
 
     @Column(name = "password")
-    @NotEmpty
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$")
-    private char[] password;
+    private String password;
 
     @OneToMany(mappedBy = "owner")
     private List<Collection> collections;
