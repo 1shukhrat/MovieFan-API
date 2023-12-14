@@ -59,15 +59,21 @@ public class MovieController {
         return movieListMapper.toDTO(movies);
     }
 
+    @GetMapping("/search")
+    public List<PreviewMovieDTO> searchByTitle(@RequestParam(name = "title") String title, @RequestParam(name = "page") int page) {
+        List<Movie> movies = movieService.getAllByTitle(page, title);
+        return movieListMapper.toDTO(movies);
+    }
+
     @GetMapping("/{id}")
-    public MovieDTO getById(@PathVariable("id") int id) {
+    public MovieDTO getById(@PathVariable("id") long id) {
         Movie movie = movieService.get(id);
         return movieMapper.toDTO(movie);
     }
 
 
     @GetMapping("/{id}/staff")
-    public StaffDTO getStaffByMovieId(@PathVariable("id") int id) {
+    public StaffDTO getStaffByMovieId(@PathVariable("id") long id) {
         StaffDTO staff = new StaffDTO();
         Movie movie = movieService.get(id);
         staff.setMovieTitle(movie.getTitle());

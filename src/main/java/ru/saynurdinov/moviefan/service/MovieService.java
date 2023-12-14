@@ -24,7 +24,7 @@ public class MovieService {
     }
 
     @Transactional(readOnly = true)
-    public Movie get(int id) {
+    public Movie get(long id) {
         Optional<Movie> movie = movieRepository.findById(id);
         return movie.orElseThrow(MovieDoesntFoundException::new);
     }
@@ -41,5 +41,11 @@ public class MovieService {
         } else {
             return movieRepository.findAllByYearOfReleaseBetween(yearStart, yearEnd, p).getContent();
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<Movie> getAllByTitle(int page, String title) {
+        return movieRepository.findAllByTitleContainingIgnoreCase(title, PageRequest.of(page, 20))
+                .getContent();
     }
 }

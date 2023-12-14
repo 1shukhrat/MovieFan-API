@@ -1,48 +1,51 @@
 package ru.saynurdinov.moviefan.security;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.saynurdinov.moviefan.DTO.UserInfoDTO;
 
 import java.io.IOException;
+import java.security.SignatureException;
+import java.util.stream.Collectors;
 
 @Component("tokenFilter")
 public class AuthTokenFilter extends OncePerRequestFilter {
-
-    private final UserDetailsService userDetailsService;
     private final JwtUtils jwtUtils;
 
     @Autowired
-    public AuthTokenFilter(UserDetailsService userDetailsService, JwtUtils jwtUtils) {
-        this.userDetailsService = userDetailsService;
+    public AuthTokenFilter(JwtUtils jwtUtils) {
         this.jwtUtils = jwtUtils;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String jwt = jwtUtils.getJwtFromCookies(request);
-        if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-            String username = jwtUtils.getUserNameFromJwtToken(jwt);
-
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userDetails,
-                            null,
-                            userDetails.getAuthorities());
-
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException,
+            IOException, ExpiredJwtException {
+        String authHeader = request.getHeader("Authorization");
+        String login = null;
+        String jwtToken = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwtToken = authHeader.substring(7);
+            login = jwtUtils.getLogin(jwtToken);
+        }
+        if (login != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserInfoDTO userInfo = new UserInfoDTO(jwtUtils.getId(jwtToken), login);
+            UsernamePasswordAuthenticationToken authenticationToken
+                    = new UsernamePasswordAuthenticationToken(userInfo, null,
+                    jwtUtils.getRoles(jwtToken).stream().map(SimpleGrantedAuthority::new)
+                            .collect(Collectors.toList()));
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
         filterChain.doFilter(request, response);
     }
