@@ -3,10 +3,11 @@ package ru.saynurdinov.moviefan.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +16,7 @@ import ru.saynurdinov.moviefan.security.JwtUtils;
 import ru.saynurdinov.moviefan.service.AuthService;
 
 @Controller
-@RequestMapping("/api/v2/")
+@RequestMapping("/api/v2/auth")
 public class AuthController {
 
     private final JwtUtils jwtUtils;
@@ -29,25 +30,29 @@ public class AuthController {
     }
 
     @PostMapping("/signIn")
-    public ResponseEntity<?> logIn(@Valid @RequestBody LoginDTO loginDTO) {
-        AuthResponse authResponse =  authService.signIn(loginDTO);
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, authResponse.getJwtCookie())
-                .body(new UserInfoDTO(authResponse.getId(), authResponse.getUsername()));
+    public ResponseEntity<?> logIn(@Valid @RequestBody LoginDTO loginDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(new String("Неверный формат введенных данных"));
+        }
+        try {
+            AuthResponse authResponse =  authService.signIn(loginDTO);
+            return ResponseEntity.ok(authResponse);
+        } catch (BadCredentialsException e) {
+            return new ResponseEntity<>(new String("Неправильный логин или пароль"), HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @PostMapping("/signUp")
-    public ResponseEntity<?> signUp(@Valid @RequestBody RegisterDTO registerDTO) {
+    public ResponseEntity<?> signUp(@Valid @RequestBody RegisterDTO registerDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(new String("Неверный формат введенных данных"));
+        }
         try {
             return ResponseEntity.ok(authService.signUp(registerDTO));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
         }
     }
-    @PostMapping("/signout")
-    public ResponseEntity<?> signOut() {
-        ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new MessageResponse("You've been signed out!"));
-    }
+
 
 }

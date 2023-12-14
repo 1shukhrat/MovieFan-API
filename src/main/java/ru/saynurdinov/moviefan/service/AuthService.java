@@ -1,11 +1,11 @@
 package ru.saynurdinov.moviefan.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,26 +23,31 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    private final UserDetailsService userDetailsService;
     @Autowired
-    public AuthService(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserRepository userRepository, PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userDetailsService = userDetailsService;
     }
 
     @Transactional
-    public AuthResponse signIn(LoginDTO loginDTO) {
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken
-                        (loginDTO.getLogin(),loginDTO.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        ResponseCookie jwtCookies = jwtUtils.generateJwtCookie(userDetails);
-        return new AuthResponse(userDetails.getId(), userDetails.getUsername(), jwtCookies.toString());
+    public AuthResponse signIn(LoginDTO loginDTO) throws BadCredentialsException {
+        try {
+            authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken
+                            (loginDTO.getLogin(),loginDTO.getPassword()));
+        } catch (BadCredentialsException e) {
+            throw e;
+        }
+        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(loginDTO.getLogin());
+        String token = jwtUtils.generateToken(userDetails);
+        return new AuthResponse(userDetails.getId(), userDetails.getLogin(), token);
     }
 
     @Transactional

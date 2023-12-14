@@ -24,7 +24,6 @@ public class StaffController {
     private final DirectorService directorService;
     private final ActorService actorService;
     private final PreviewMovieListMapper movieListMapper;
-
     private final ActorMapper actorMapper;
     private final DirectorMapper directorMapper;
 
@@ -38,27 +37,27 @@ public class StaffController {
     }
 
     @GetMapping("/directors/{id}")
-    public DirectorDTO getDirectorById(@PathVariable("id") int id) {
+    public DirectorDTO getDirectorById(@PathVariable("id") long id) {
         Director director = directorService.getById(id);
         return directorMapper.toDTO(director);
     }
 
     @GetMapping("/actors/{id}")
-    public ActorDTO getActorById(@PathVariable("id") int id) {
+    public ActorDTO getActorById(@PathVariable("id") long id) {
         Actor actor = actorService.getById(id);
         return actorMapper.toDTO(actor);
     }
 
 
     @GetMapping("/directors/{id}/movies")
-    public List<PreviewMovieDTO> getMovieListByDirectorId(@PathVariable("id") int directorId,
+    public List<PreviewMovieDTO> getMovieListByDirectorId(@PathVariable("id") long directorId,
                                                           @RequestParam(value = "page", defaultValue = "0") int page) {
         List<Movie> movieList = directorService.getMoviesById(directorId, page);
         return movieListMapper.toDTO(movieList);
     }
 
     @GetMapping("/actors/{id}/movies")
-    public List<PreviewMovieDTO> getMovieListByActorId(@PathVariable("id") int actorId,
+    public List<PreviewMovieDTO> getMovieListByActorId(@PathVariable("id") long actorId,
                                                        @RequestParam(value = "page", defaultValue = "0")
                                                        int page) {
         List<Movie> movieList = actorService.getMoviesById(actorId, page);

@@ -7,7 +7,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ru.saynurdinov.moviefan.model.User;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
@@ -16,13 +20,19 @@ public class UserDetailsImpl implements UserDetails {
     private String login;
     @JsonIgnore
     private String password;
+
+    private List<String> roles;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
     }
 
     public static UserDetails build(User user) {
-        return new UserDetailsImpl(user.getId(), user.getLogin(), user.getPassword());
+        return new UserDetailsImpl(user.getId(),
+                user.getLogin(),
+                user.getPassword(),
+                Collections.singletonList("USER"));
     }
 
     @Override

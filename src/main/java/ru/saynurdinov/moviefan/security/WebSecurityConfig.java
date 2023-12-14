@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,17 +19,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
 public class WebSecurityConfig {
 
-    private final UserDetailsService userDetailsService;
-    private final OncePerRequestFilter requestFilter;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final AuthTokenFilter requestFilter;
     private final AuthenticationEntryPoint entryPoint;
 
     @Autowired
-    public WebSecurityConfig(UserDetailsService userDetailsService, @Qualifier("tokenFilter") OncePerRequestFilter requestFilter, AuthenticationEntryPoint entryPoint) {
+    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, AuthTokenFilter requestFilter, AuthenticationEntryPoint entryPoint) {
         this.userDetailsService = userDetailsService;
         this.requestFilter = requestFilter;
         this.entryPoint = entryPoint;
@@ -53,16 +60,31 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(handler -> handler.authenticationEntryPoint(entryPoint))
+        return http.csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth ->
+                        auth.requestMatchers("/api/v2/auth/**", "/api/v1/**").permitAll()
+                                .anyRequest().authenticated())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/v1").permitAll()
-                                .anyRequest().authenticated())
                 .authenticationProvider(daoAuthenticationProvider())
                 .addFilterBefore(requestFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("*");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("GET");
+        configuration.addAllowedMethod("POST");
+        configuration.addAllowedMethod("PUT");
+        configuration.addAllowedMethod("PATCH");
+        configuration.addAllowedMethod("DELETE");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
 }

@@ -13,6 +13,6 @@ public class RegisterDTO {
     @Size(min = 4, max = 20)
     private String login;
     @NotBlank
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@()$!%*#?&])[A-Za-z\\d@()$!%*#?&]{8,20}$")
     private String password;
 }

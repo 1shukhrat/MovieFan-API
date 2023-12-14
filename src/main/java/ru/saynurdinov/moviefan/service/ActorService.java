@@ -26,12 +26,12 @@ public class ActorService {
     }
 
     @Transactional(readOnly = true)
-    public Actor getById(int id) {
+    public Actor getById(long id) {
         return actorRepository.findById(id).orElse(null);
     }
 
     @Transactional(readOnly = true)
-    public List<Movie> getMoviesById(int id, int page) {
+    public List<Movie> getMoviesById(long id, int page) {
         Optional<Actor> actor = actorRepository.findById(id);
         return actor.isPresent()?movieRepository.findAllByActors(actor.get(), PageRequest.of(page, 20)).getContent():Collections.emptyList();
     }

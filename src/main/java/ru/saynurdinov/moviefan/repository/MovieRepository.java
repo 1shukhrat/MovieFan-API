@@ -12,7 +12,7 @@ import ru.saynurdinov.moviefan.model.*;
 
 import java.util.List;
 
-public interface MovieRepository extends JpaRepository<Movie, Integer> {
+public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     Slice<Movie> findAllByYearOfReleaseBetween(int yearStart, int yearEnd, Pageable p);
     Slice<Movie> findAllByGenresAndYearOfReleaseBetween(Genre genre, int yearStart, int yearEnd, Pageable p);
@@ -21,7 +21,7 @@ public interface MovieRepository extends JpaRepository<Movie, Integer> {
     Slice<Movie> findAllByDirectors(Director director, Pageable p);
     Slice<Movie> findAllByActors(Actor actor, Pageable p);
 
-    Slice<Movie> findAllByTitleContaining(String title, Pageable p);
+    Slice<Movie> findAllByTitleContainingIgnoreCase(String title, Pageable p);
 
 
 }

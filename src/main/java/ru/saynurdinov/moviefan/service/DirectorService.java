@@ -27,12 +27,12 @@ public class DirectorService {
     }
 
     @Transactional(readOnly = true)
-    public Director getById(int id) {
+    public Director getById(long id) {
         return directorRepository.findById(id).orElse(null);
     }
 
     @Transactional(readOnly = true)
-    public List<Movie> getMoviesById(int id, int page) {
+    public List<Movie> getMoviesById(long id, int page) {
         Optional<Director> director = directorRepository.findById(id);
         return director.isPresent()?movieRepository.findAllByDirectors(director.get(), PageRequest.of(page, 20)).getContent():Collections.emptyList();
     }
