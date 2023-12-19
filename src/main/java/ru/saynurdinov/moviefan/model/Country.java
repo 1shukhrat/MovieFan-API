@@ -2,6 +2,7 @@ package ru.saynurdinov.moviefan.model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ public class Country {
 
     @Id
     @Column(name = "name")
+    @NotBlank
     private String name;
 
     @ManyToMany

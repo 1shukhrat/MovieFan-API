@@ -3,6 +3,7 @@ package ru.saynurdinov.moviefan.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.saynurdinov.moviefan.DTO.MessageResponse;
 import ru.saynurdinov.moviefan.DTO.PostReviewDTO;
 import ru.saynurdinov.moviefan.DTO.ReviewDTO;
 import ru.saynurdinov.moviefan.mapper.ReviewListMapper;
@@ -27,19 +28,19 @@ public class ReviewController {
     @GetMapping
     public List<ReviewDTO> getAllByMovieId(@RequestParam("movieId") long movieId,
                                            @RequestParam(value = "page", defaultValue = "0") int page) {
-        List<Review> reviewList = reviewService.getAllByMovie(movieId, page);
-        return reviewListMapper.toDTO(reviewList);
+        return reviewService.getAllByMovie(movieId, page);
     }
 
-    @PostMapping
-    public ResponseEntity.BodyBuilder addReview(@RequestBody PostReviewDTO postReviewDTO) {
+    @PostMapping(value = "/add")
+    public ResponseEntity addReview(@RequestBody PostReviewDTO postReviewDTO) {
         reviewService.addReview(postReviewDTO);
-        return ResponseEntity.ok();
+        return ResponseEntity.ok(new MessageResponse("Отзыв был успешно опубликован"));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity.BodyBuilder deleteReview(@PathVariable("id") long previewId) {
-        return null;
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity deleteReview(@PathVariable("id") long reviewId) {
+        reviewService.remove(reviewId);
+        return ResponseEntity.ok(new MessageResponse("Отзыв был успешно удален"));
     }
 
 }

@@ -1,6 +1,7 @@
 package ru.saynurdinov.moviefan.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,22 +18,22 @@ public class Movie {
     private long id;
 
     @Column(name = "title")
+    @NotBlank
     private String title;
 
     @Column(name = "outline")
+    @NotBlank
     private String outline;
 
     @Column(name = "year")
     private int yearOfRelease;
 
     @Column(name = "poster")
+    @NotBlank
     private String posterUrl;
 
-    @Column(name = "user_rating")
+    @Column(name = "user_rating", precision = 3, scale = 1)
     private double userRating;
-
-    @Column(name = "rated_count")
-    private int ratedCount;
 
     @ManyToMany(mappedBy = "movies")
     private List<Director> directors;
@@ -49,7 +50,14 @@ public class Movie {
     @OneToMany(mappedBy = "movie")
     private List<Review> reviews;
 
+    @OneToMany(mappedBy = "movie")
+    private List<Rating> ratings;
+
     @ManyToMany(mappedBy = "movies")
     private List<Collection> collections;
+
+    public void calculateRating() {
+        userRating = (double) ratings.stream().mapToInt(Rating::getValue).sum() / ratings.size();
+    }
 
 }

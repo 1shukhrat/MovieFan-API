@@ -32,20 +32,20 @@ public class AuthController {
     @PostMapping("/signIn")
     public ResponseEntity<?> logIn(@Valid @RequestBody LoginDTO loginDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(new String("Неверный формат введенных данных"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Неверный формат введенных данных"));
         }
         try {
             AuthResponse authResponse =  authService.signIn(loginDTO);
             return ResponseEntity.ok(authResponse);
         } catch (BadCredentialsException e) {
-            return new ResponseEntity<>(new String("Неправильный логин или пароль"), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new MessageResponse("Неправильный логин или пароль"), HttpStatus.UNAUTHORIZED);
         }
     }
 
     @PostMapping("/signUp")
     public ResponseEntity<?> signUp(@Valid @RequestBody RegisterDTO registerDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(new String("Неверный формат введенных данных"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Неверный формат введенных данных"));
         }
         try {
             return ResponseEntity.ok(authService.signUp(registerDTO));

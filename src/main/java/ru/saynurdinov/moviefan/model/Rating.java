@@ -3,18 +3,19 @@ package ru.saynurdinov.moviefan.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import lombok.Data;
 
 @Entity
 @Table(name = "rating")
+@Data
 public class Rating {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "rating_id")
     private long id;
 
     @Column(name = "value")
-    @Min(value = 0)
-    @Max(value = 10)
     private int value;
 
     @ManyToOne

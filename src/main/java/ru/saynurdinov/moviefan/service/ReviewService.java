@@ -17,7 +17,9 @@ import ru.saynurdinov.moviefan.repository.MovieRepository;
 import ru.saynurdinov.moviefan.repository.ReviewRepository;
 import ru.saynurdinov.moviefan.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReviewService {
@@ -34,8 +36,14 @@ public class ReviewService {
     }
 
     @Transactional
-    public List<Review> getAllByMovie(long movieId, int page) {
-        return reviewRepository.getReviewByMovie_Id(movieId, PageRequest.of(page, 20)).getContent();
+    public List<ReviewDTO> getAllByMovie(long movieId, int page) {
+        List<Review> reviewList =  reviewRepository.getReviewByMovie_Id(movieId, PageRequest.of(page, 20)).getContent();
+        List<ReviewDTO> reviewDTOList = new ArrayList<>();
+        for (Review review: reviewList) {
+            ReviewDTO reviewDTO = new ReviewDTO(review.getId(), review.getText(), new UserInfoDTO(review.getOwner().getId(), review.getOwner().getLogin()));
+            reviewDTOList.add(reviewDTO);
+        }
+        return reviewDTOList;
     }
 
     @Transactional
@@ -53,6 +61,17 @@ public class ReviewService {
             movieRepository.save(movie);
             reviewRepository.save(review);
             userRepository.save(user);
+        }
+    }
+
+    @Transactional
+    public void remove(long id) {
+        Optional<Review> reviewOptional = reviewRepository.findById(id);
+        if (reviewOptional.isPresent()) {
+            Review review = reviewOptional.get();
+            review.getMovie().getReviews().remove(review);
+            review.getOwner().getReviews().remove(review);
+            reviewRepository.delete(review);
         }
     }
 }

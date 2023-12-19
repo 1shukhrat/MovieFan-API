@@ -1,6 +1,7 @@
 package ru.saynurdinov.moviefan.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,6 +18,7 @@ public class Director {
     private long id;
 
     @Column(name = "full_name")
+    @NotBlank
     private String fullName;
 
     @Column(name = "photo")

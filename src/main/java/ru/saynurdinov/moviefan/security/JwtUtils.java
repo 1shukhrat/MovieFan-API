@@ -2,6 +2,7 @@ package ru.saynurdinov.moviefan.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,8 +14,8 @@ import java.util.List;
 @Component
 public class JwtUtils {
 
-    //@Value("${security.jwt.secret-key}")
-    private final static  SecretKey secret = Jwts.SIG.HS256.key().build();
+    @Value("${security.jwt.secret-key}")
+    private String secret;
     @Value("${security.jwt.expiration-time}")
     private Duration expirationTime;
 
@@ -27,7 +28,7 @@ public class JwtUtils {
                 .subject(userDetails.getLogin())
                 .issuedAt(issuedDate)
                 .expiration(expiredDate)
-                .signWith(secret)
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .compact();
     }
 
@@ -48,7 +49,7 @@ public class JwtUtils {
 
     private Claims getClaims(String token) {
         return Jwts.parser()
-                .verifyWith(secret)
+                .verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
