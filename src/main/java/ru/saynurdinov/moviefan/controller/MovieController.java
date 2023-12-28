@@ -23,10 +23,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/movies")
 public class MovieController {
-
-    private final DirectorService directorService;
-
-    private final ActorService actorService;
     private final MovieService movieService;
     private final MovieMapper movieMapper;
     private final PreviewMovieListMapper movieListMapper;
@@ -37,9 +33,7 @@ public class MovieController {
 
 
     @Autowired
-    public MovieController(DirectorService directorService, ActorService actorService, MovieService movieService, MovieMapper movieMapper, PreviewMovieListMapper movieListMapper, DirectorListMapper directorListMapper, ActorListMapper actorListMapper, GenreService genreService, CountryService countryService) {
-        this.directorService = directorService;
-        this.actorService = actorService;
+    public MovieController(MovieService movieService, MovieMapper movieMapper, PreviewMovieListMapper movieListMapper, DirectorListMapper directorListMapper, ActorListMapper actorListMapper, GenreService genreService, CountryService countryService) {
         this.movieService = movieService;
         this.movieMapper = movieMapper;
         this.movieListMapper = movieListMapper;

@@ -16,8 +16,8 @@ import java.util.List;
 public class CountryController {
 
 
-    private CountryService countryService;
-    private CountryListMapper countryListMapper;
+    private final CountryService countryService;
+    private final CountryListMapper countryListMapper;
 
     @Autowired
     public CountryController(CountryService countryService, CountryListMapper countryListMapper) {

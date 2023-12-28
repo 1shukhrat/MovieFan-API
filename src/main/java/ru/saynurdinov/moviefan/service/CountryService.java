@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.saynurdinov.moviefan.model.Country;
-import ru.saynurdinov.moviefan.model.Genre;
 import ru.saynurdinov.moviefan.repository.CountryRepository;
 
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.Optional;
 @Service
 public class CountryService {
 
-    private CountryRepository countryRepository;
+    private final CountryRepository countryRepository;
 
     @Autowired
     public CountryService(CountryRepository countryRepository) {

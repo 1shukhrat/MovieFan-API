@@ -16,6 +16,8 @@ public class Rating {
     private long id;
 
     @Column(name = "value")
+    @Min(value = 0)
+    @Max(value = 10)
     private int value;
 
     @ManyToOne

@@ -34,6 +34,6 @@ public class DirectorService {
     @Transactional(readOnly = true)
     public List<Movie> getMoviesById(long id, int page) {
         Optional<Director> director = directorRepository.findById(id);
-        return director.isPresent()?movieRepository.findAllByDirectors(director.get(), PageRequest.of(page, 20)).getContent():Collections.emptyList();
+        return director.map(value -> movieRepository.findAllByDirectors(value, PageRequest.of(page, 20)).getContent()).orElse(Collections.emptyList());
     }
 }

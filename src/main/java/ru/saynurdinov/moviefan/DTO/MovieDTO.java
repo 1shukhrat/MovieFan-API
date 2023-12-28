@@ -1,15 +1,10 @@
 package ru.saynurdinov.moviefan.DTO;
 
-import jakarta.persistence.ManyToMany;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import ru.saynurdinov.moviefan.model.Country;
-import ru.saynurdinov.moviefan.model.Genre;
-
+import lombok.*;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class MovieDTO {

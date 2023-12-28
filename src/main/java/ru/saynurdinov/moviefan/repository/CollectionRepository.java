@@ -10,9 +10,7 @@ import java.util.List;
 
 @Repository
 public interface CollectionRepository extends JpaRepository<Collection, Long> {
-
     @Query("SELECT c FROM Collection c WHERE c.owner.id = :ownerId AND NOT EXISTS (SELECT mc FROM c.movies mc WHERE mc.id = :movieId)")
     List<Collection> findAllByOwner_IdAndMovies_IdNotOrMovies_IdIsNull(@Param("ownerId") Long ownerId, @Param("movieId") Long movieId);
     List<Collection> findAllByOwner_Id(Long ownerId);
-
 }

@@ -7,25 +7,23 @@ import org.springframework.http.*;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.saynurdinov.moviefan.DTO.*;
-import ru.saynurdinov.moviefan.security.JwtUtils;
 import ru.saynurdinov.moviefan.service.AuthService;
+import ru.saynurdinov.moviefan.util.AuthResponse;
+import ru.saynurdinov.moviefan.util.MessageResponse;
 
 @Controller
 @RequestMapping("/api/v2/auth")
 public class AuthController {
 
-    private final JwtUtils jwtUtils;
 
     private final AuthService authService;
 
     @Autowired
-    public AuthController(JwtUtils jwtUtils, AuthService authService) {
-        this.jwtUtils = jwtUtils;
+    public AuthController(AuthService authService) {
         this.authService = authService;
     }
 

@@ -13,7 +13,7 @@ import java.util.Optional;
 @Service
 public class GenreService {
 
-    private GenreRepository genreRepository;
+    private final GenreRepository genreRepository;
 
     @Autowired
     public GenreService(GenreRepository genreRepository) {

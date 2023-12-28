@@ -1,12 +1,14 @@
 package ru.saynurdinov.moviefan.DTO;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PostReviewDTO {
     @NotBlank
     private String text;
-    private UserInfoDTO userInfoDTO;
     private long movieId;
 }

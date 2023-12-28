@@ -1,13 +1,13 @@
 package ru.saynurdinov.moviefan.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
-import ru.saynurdinov.moviefan.DTO.MessageResponse;
+import ru.saynurdinov.moviefan.util.MessageResponse;
 import ru.saynurdinov.moviefan.DTO.PostReviewDTO;
 import ru.saynurdinov.moviefan.DTO.ReviewDTO;
-import ru.saynurdinov.moviefan.mapper.ReviewListMapper;
-import ru.saynurdinov.moviefan.model.Review;
 import ru.saynurdinov.moviefan.service.ReviewService;
 
 import java.util.List;
@@ -17,12 +17,10 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
-    private final ReviewListMapper reviewListMapper;
 
     @Autowired
-    public ReviewController(ReviewService reviewService, ReviewListMapper reviewListMapper) {
+    public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
-        this.reviewListMapper = reviewListMapper;
     }
 
     @GetMapping
@@ -32,15 +30,24 @@ public class ReviewController {
     }
 
     @PostMapping(value = "/add")
-    public ResponseEntity addReview(@RequestBody PostReviewDTO postReviewDTO) {
-        reviewService.addReview(postReviewDTO);
-        return ResponseEntity.ok(new MessageResponse("Отзыв был успешно опубликован"));
+    public ResponseEntity<?> addReview(@RequestBody PostReviewDTO postReviewDTO) {
+        try {
+            reviewService.addReview(postReviewDTO);
+            return ResponseEntity.ok(new MessageResponse("Отзыв был успешно опубликован"));
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse(e.getMessage()));
+        }
+
     }
 
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity deleteReview(@PathVariable("id") long reviewId) {
-        reviewService.remove(reviewId);
-        return ResponseEntity.ok(new MessageResponse("Отзыв был успешно удален"));
+    public ResponseEntity<?> deleteReview(@PathVariable("id") long reviewId) {
+        try {
+            reviewService.remove(reviewId);
+            return ResponseEntity.ok(new MessageResponse("Отзыв был успешно удален"));
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse(e.getMessage()));
+        }
     }
 
 }

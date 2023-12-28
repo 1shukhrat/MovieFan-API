@@ -1,4 +1,4 @@
-package ru.saynurdinov.moviefan.DTO;
+package ru.saynurdinov.moviefan.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

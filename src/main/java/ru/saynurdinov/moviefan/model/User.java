@@ -3,9 +3,6 @@ package ru.saynurdinov.moviefan.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,7 +25,6 @@ public class User {
 
     @Column(name = "password")
     @NotBlank
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@()$!%*#?&])[A-Za-z\\d@()$!%*#?&]{8,20}$")
     private String password;
 
     @OneToMany(mappedBy = "owner")

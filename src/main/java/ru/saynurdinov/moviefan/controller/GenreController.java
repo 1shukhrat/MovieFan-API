@@ -16,9 +16,9 @@ import java.util.List;
 public class GenreController {
 
 
-    private GenreService genreService;
+    private final GenreService genreService;
 
-    private GenreListMapper genreListMapper;
+    private final GenreListMapper genreListMapper;
 
     @Autowired
     public GenreController(GenreService genreService, GenreListMapper genreListMapper) {

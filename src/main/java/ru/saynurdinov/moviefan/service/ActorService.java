@@ -33,6 +33,6 @@ public class ActorService {
     @Transactional(readOnly = true)
     public List<Movie> getMoviesById(long id, int page) {
         Optional<Actor> actor = actorRepository.findById(id);
-        return actor.isPresent()?movieRepository.findAllByActors(actor.get(), PageRequest.of(page, 20)).getContent():Collections.emptyList();
+        return actor.map(value -> movieRepository.findAllByActors(value, PageRequest.of(page, 20)).getContent()).orElse(Collections.emptyList());
     }
 }

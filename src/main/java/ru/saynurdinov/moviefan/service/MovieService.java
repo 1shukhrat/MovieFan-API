@@ -9,7 +9,7 @@ import ru.saynurdinov.moviefan.model.*;
 import ru.saynurdinov.moviefan.repository.MovieRepository;
 import ru.saynurdinov.moviefan.util.MovieDoesntFoundException;
 
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
 

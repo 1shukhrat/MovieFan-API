@@ -57,7 +57,12 @@ public class Movie {
     private List<Collection> collections;
 
     public void calculateRating() {
-        userRating = (double) ratings.stream().mapToInt(Rating::getValue).sum() / ratings.size();
+        if (ratings.isEmpty()) {
+            userRating = 0.0;
+        }
+        else {
+            userRating = (double) ratings.stream().mapToInt(Rating::getValue).sum() / ratings.size();
+        }
     }
 
 }

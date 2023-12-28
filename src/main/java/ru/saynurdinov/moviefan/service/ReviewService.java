@@ -2,9 +2,9 @@ package ru.saynurdinov.moviefan.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.saynurdinov.moviefan.DTO.PostReviewDTO;
@@ -62,6 +62,7 @@ public class ReviewService {
             reviewRepository.save(review);
             userRepository.save(user);
         }
+        else throw new UsernameNotFoundException("Нет доступа. Данные пользователя неверны");
     }
 
     @Transactional
@@ -69,9 +70,17 @@ public class ReviewService {
         Optional<Review> reviewOptional = reviewRepository.findById(id);
         if (reviewOptional.isPresent()) {
             Review review = reviewOptional.get();
-            review.getMovie().getReviews().remove(review);
-            review.getOwner().getReviews().remove(review);
-            reviewRepository.delete(review);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication.isAuthenticated()) {
+                UserInfoDTO userInfoDTO = (UserInfoDTO) authentication.getPrincipal();
+                if (userInfoDTO.getId() == review.getOwner().getId()) {
+                    review.getMovie().getReviews().remove(review);
+                    review.getOwner().getReviews().remove(review);
+                    reviewRepository.delete(review);
+                }
+                else throw new UsernameNotFoundException("Нет доступа. Данные пользователя неверны");
+            }
+
         }
     }
 }

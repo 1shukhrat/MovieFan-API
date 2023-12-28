@@ -4,15 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.saynurdinov.moviefan.DTO.AuthResponse;
+import ru.saynurdinov.moviefan.util.AuthResponse;
 import ru.saynurdinov.moviefan.DTO.LoginDTO;
 import ru.saynurdinov.moviefan.DTO.RegisterDTO;
-import ru.saynurdinov.moviefan.DTO.MessageResponse;
+import ru.saynurdinov.moviefan.util.MessageResponse;
 import ru.saynurdinov.moviefan.model.User;
 import ru.saynurdinov.moviefan.repository.UserRepository;
 import ru.saynurdinov.moviefan.security.JwtUtils;
@@ -38,13 +37,9 @@ public class AuthService {
 
     @Transactional
     public AuthResponse signIn(LoginDTO loginDTO) throws BadCredentialsException {
-        try {
-            authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken
-                            (loginDTO.getLogin(),loginDTO.getPassword()));
-        } catch (BadCredentialsException e) {
-            throw e;
-        }
+        authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken
+                        (loginDTO.getLogin(),loginDTO.getPassword()));
         UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(loginDTO.getLogin());
         String token = jwtUtils.generateToken(userDetails);
         return new AuthResponse(userDetails.getId(), userDetails.getLogin(), token);
@@ -52,7 +47,7 @@ public class AuthService {
 
     @Transactional
     public MessageResponse signUp(RegisterDTO registerDTO) {
-        if (userRepository.existsUserByLogin(registerDTO.getLogin())) {
+        if (userRepository.findByLogin(registerDTO.getLogin()).isPresent()) {
             throw new IllegalArgumentException("Error: User with this username is already exists");
         }
         User user = new User();
